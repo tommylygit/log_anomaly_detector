@@ -1,0 +1,50 @@
+import random as rd #tirer au sort des adresses IP ou des status HTTP (générer des nombres au hasard pour simuler des fausses adresses IP et choisir des codes HTTP comme 200 ou 404)
+import time #obtenir la date et l'heure exactes de mon système à la seconde près
+from datetime import datetime #Créer des micro-pauses dans le script pour que les logs ne s'affichent pas tous à la même milliseconde
+
+status_codes = ["200","404","500"]
+methodes = ["GET","POST","DELETE"]
+chemins_acces = ["/","/login","/api/data","/assets/style.css"]
+
+#200 requête avec succès HTTP, #404 Page introuvable, #500 Internal Server Error
+def generate_ip():
+    rand1 = rd.randint(0,255)
+    rand2 = rd.randint(0,255)
+    rand3 = rd.randint(0,255)
+    rand4 = rd.randint(0,255)
+    return(f'{rand1}.{rand2}.{rand3}.{rand4}')
+
+print(generate_ip())
+
+def generate_timestamp():
+    date = datetime.now()
+    return str(date.strftime("%d/%b/%Y:%H:%M:%S"))
+
+print(generate_timestamp())
+# 27/Aug/2026:15:08:23
+
+def generate_log_line_complet():
+    return f'{generate_ip()} - - [{generate_timestamp()}] "{rd.choice(methodes)}{rd.choice(chemins_acces)} HTTP/1.1" {rd.choice(status_codes)}'
+
+
+while True:
+
+    attack = rd.random()
+    if attack > 0.05:
+         log = generate_log_line_complet()
+         duree_sleep = rd.uniform(0.1, 2.0)
+         time.sleep(duree_sleep)
+         print(log)
+        
+    elif 0 < attack < 0.025:
+         for _ in range(50):
+            print(f'{generate_ip()} - - [{generate_timestamp()}] "{rd.choice(methodes)} {rd.choice(chemins_acces)} HTTP/1.1" 500')
+
+    elif 0.025 < attack < 0.05:
+        chemin_sensibles = ["/admin.php","/backup.zip","/.env", "/config.yaml"]
+        hacker_ip = generate_ip()
+        for _ in range(20):
+            print(f'{hacker_ip} - - [{generate_timestamp()}] "GET {rd.choice(chemin_sensibles)} HTTP/1.1" 404')
+            
+
+        
