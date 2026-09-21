@@ -30,21 +30,25 @@ def generate_log_line_complet():
 while True:
 
     attack = rd.random()
-    if attack > 0.05:
+    if attack > 0.06:
          log = generate_log_line_complet()
          duree_sleep = rd.uniform(0.1, 2.0)
          time.sleep(duree_sleep)
          print(log)
         
-    elif 0 < attack < 0.025:
+    elif 0 < attack <= 0.02:
          for _ in range(50):
             print(f'{generate_ip()} - - [{generate_timestamp()}] "{rd.choice(methodes)} {rd.choice(chemins_acces)} HTTP/1.1" 500')
 
-    elif 0.025 < attack < 0.05:
+    elif 0.02 <= attack <= 0.04:
         chemin_sensibles = ["/admin.php","/backup.zip","/.env", "/config.yaml"]
         hacker_ip = generate_ip()
         for _ in range(20):
             print(f'{hacker_ip} - - [{generate_timestamp()}] "GET {rd.choice(chemin_sensibles)} HTTP/1.1" 404')
-            
+    
+    elif 0.04 <= attack <= 0.06:
+        forcebrute_ip = generate_ip()
+        for _ in range(50):
+            print(f'{forcebrute_ip} - - [{generate_timestamp()}] "POST /login HTTP/1.1" 401')
 
         
