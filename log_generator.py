@@ -14,41 +14,40 @@ def generate_ip():
     rand4 = rd.randint(0,255)
     return(f'{rand1}.{rand2}.{rand3}.{rand4}')
 
-print(generate_ip())
 
 def generate_timestamp():
     date = datetime.now()
     return str(date.strftime("%d/%b/%Y:%H:%M:%S"))
 
-print(generate_timestamp())
+
 # 27/Aug/2026:15:08:23
 
 def generate_log_line_complet():
-    return f'{generate_ip()} - - [{generate_timestamp()}] "{rd.choice(methodes)}{rd.choice(chemins_acces)} HTTP/1.1" {rd.choice(status_codes)}'
+    return f'{generate_ip()} - - [{generate_timestamp()}] "{rd.choice(methodes)}{rd.choice(chemins_acces)} HTTP/1.1" {rd.choice(status_codes)}\n'
 
-
-while True:
-
-    attack = rd.random()
-    if attack > 0.06:
-         log = generate_log_line_complet()
-         duree_sleep = rd.uniform(0.1, 2.0)
-         time.sleep(duree_sleep)
-         print(log)
-        
-    elif 0 < attack <= 0.02:
-         for _ in range(50):
-            print(f'{generate_ip()} - - [{generate_timestamp()}] "{rd.choice(methodes)} {rd.choice(chemins_acces)} HTTP/1.1" 500')
-
-    elif 0.02 <= attack <= 0.04:
-        chemin_sensibles = ["/admin.php","/backup.zip","/.env", "/config.yaml"]
-        hacker_ip = generate_ip()
-        for _ in range(20):
-            print(f'{hacker_ip} - - [{generate_timestamp()}] "GET {rd.choice(chemin_sensibles)} HTTP/1.1" 404')
+with open("server_log", "w") as f:
     
-    elif 0.04 <= attack <= 0.06:
-        forcebrute_ip = generate_ip()
-        for _ in range(50):
-            print(f'{forcebrute_ip} - - [{generate_timestamp()}] "POST /login HTTP/1.1" 401')
+    for i in range(100000):
+
+        attack = rd.random()
+        if attack > 0.06:
+            log = generate_log_line_complet()            
+            f.write(log)
+        
+        elif 0 < attack <= 0.02:
+            for _ in range(50):
+                f.write(f'{generate_ip()} - - [{generate_timestamp()}] "{rd.choice(methodes)} {rd.choice(chemins_acces)} HTTP/1.1" 500\n')
+
+        elif 0.02 <= attack <= 0.04:
+            chemin_sensibles = ["/admin.php","/backup.zip","/.env", "/config.yaml"]
+            hacker_ip = generate_ip()
+            for _ in range(20):
+                f.write(f'{hacker_ip} - - [{generate_timestamp()}] "GET {rd.choice(chemin_sensibles)} HTTP/1.1" 404\n')
+    
+        elif 0.04 <= attack <= 0.06:
+            forcebrute_ip = generate_ip()
+            for _ in range(50):
+                f.write(f'{forcebrute_ip} - - [{generate_timestamp()}] "POST /login HTTP/1.1" 401\n')
+
 
         
