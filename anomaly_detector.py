@@ -1,23 +1,57 @@
-import pandas as pd #At first I wanted to use pandas with pd.read_csv, but choosing sep is quite difficult even if we choose regex
+"""Log parser: turns the raw web server log into a pandas DataFrame.
 
-with open("server_log", "r") as file:
-#IP / DATE / METHODE / CHEMIN / STATUT
-#4.88.197.27 - - [07/Oct/2026:23:36:13] "DELETE/login HTTP/1.1" 500
-    for line in file:
-        tokens = line.split(sep='"') #tokens = [4.81.107.27 - - [07/Oct/2026:23:36:12] ,DELETE/login HTTP/1.1, 500\n]
-        ip_and_date = tokens[0].split() #ip_and_date = [4.81.107.27, -, -, [07/Oct/2026:23:36:12]]
-        ip = ip_and_date[0]
-        date = ip_and_date[3]
-        path = tokens[1]
-        status = tokens[2]
+Expected line format (produced by log_generator.py):
+    IP - - [DD/Mon/YYYY:HH:MM:SS] "METHOD /path HTTP/1.1" STATUS
+"""
+import pandas as pd
+
+LOG_FILE = "server_log"
+LABEL_FILE = "server_log_labels.csv"
+DATE_FORMAT = "%d/%b/%Y:%H:%M:%S"
 
 
+def parse_line(line):
+    parts = line.strip().split('"')
+    date = parts[0].split("[")[1].split("]")[0]
+    method, path, _ = parts[1].split()
+    return {"ip": ip, "timestamp": date, "method": method, "path": path, "status": status}
 
-            
-            
 
-        
-            
+def load_logs(log_file=LOG_FILE):
+    rows = []
+    with open(log_file) as f:
+        for line in f:
+            rows.append(parse_line(line))
+
+    df = pd.DataFrame(rows)
+    df["timestamp"] = pd.to_datetime(df["timestamp"], format=DATE_FORMAT)
+    return df
+
+
+def load_labels(label_file=LABEL_FILE):
+    return pd.read_csv(label_file)["label"]
+
+#main
+def main():
+    df = load_logs()
+    df["label"] = load_labels().values
+
+    print(df.shape)
+    print(df.dtypes)
+    print(df.head())
+    print(df["label"].value_counts())
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+
+
+
+
+
 
 
 
